@@ -14,7 +14,7 @@ Aby uruchomić aplikację, upewnij się, że masz zainstalowane:
 ### 1. Sklonuj repozytorium
 ```bash
 git clone git@github.com:Flow-25/www_django3.git
-cd trasy
+cd www_django3
 ```
 
 ### 2. Utwórz i aktywuj wirtualne środowisko (opcjonalne)
