@@ -48,3 +48,26 @@ python manage.py runserver
 
 ## Użycie
 Otwórz przeglądarkę i przejdź do adresu [http://127.0.0.1:8000/](http://127.0.0.1:8000/), aby zobaczyć działającą aplikację.
+
+## Super user:
+
+1. **Uruchom polecenie zarządzania**:
+  ```bash
+  python manage.py createsuperuser
+  ```
+
+2. **Podaj wymagane dane**:
+  - Nazwę użytkownika
+  - Adres e-mail
+  - Hasło (wpisz i potwierdź)
+
+3. **Zaloguj się do panelu administracyjnego**:
+  - Uruchom serwer deweloperski:
+    ```bash
+    python manage.py runserver
+    ```
+  - Otwórz przeglądarkę i przejdź pod adres:
+    ```
+    http://127.0.0.1:8000/admin/
+    ```
+  - Zaloguj się za pomocą danych superusera.
