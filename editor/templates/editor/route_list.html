@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edytor Tras</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f9f4; /* Subtelne zielonkawe tło */
+            margin: 0;
+            padding: 0;
+            color: #212529; /* Neutralny kolor tekstu */
+        }
+        .header {
+            background-color: #4CAF50; /* Zielony pasek nagłówka */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .header a:hover {
+            text-decoration: underline;
+        }
+        .logout-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .logout-container button {
+            background-color: #f44336; /* Czerwony przycisk wylogowania */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .logout-container button:hover {
+            background-color: #d32f2f; /* Ciemniejszy czerwony na hover */
+        }
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .app-description {
+            background-color: #ffffff; /* Białe tło dla opisu */
+            padding: 20px;
+            border-radius: 10px; /* Zaokrąglone rogi */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+            margin-bottom: 20px;
+        }
+        .app-description h2 {
+            color: #388e3c; /* Zielony kolor nagłówka */
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #f1f8e9; /* Jasnozielone tło dla elementów listy */
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #c8e6c9; /* Jasnozielone obramowanie */
+            border-radius: 5px; /* Zaokrąglone rogi */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        ul li a {
+            text-decoration: none;
+            color: #2e7d32; /* Ciemniejszy zielony kolor tekstu */
+            font-weight: bold;
+        }
+        ul li a:hover {
+            text-decoration: underline;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #333;
+            border-radius: 5px; /* Zaokrąglone rogi */
+            margin: 0 5px;
+        }
+        .pagination a.active {
+            background-color: #4CAF50; /* Zielony aktywny przycisk */
+            color: white;
+            border: 1px solid #4CAF50;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+        footer {
+            background-color: #4CAF50; /* Zielona stopka */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'route_create' %}">Stwórz nową trasę</a>
+        <h1>Edytor Tras</h1>
+        {% if user.is_authenticated %}
+            <div class="logout-container">
+                Zalogowany jako {{ user.username }} |
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Wyloguj</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="content">
+        <div class="app-description">
+            <h2>O Edytorze Tras</h2>
+            <p>
+        Witaj w Edytorze Tras! To narzędzie pozwala Ci tworzyć i edytować trasy na wybranych tłach. 
+        Dodawaj, przesuwaj i modyfikuj punkty trasy, aby idealnie dopasować je do swoich potrzeb. 
+        Każdy punkt jest precyzyjnie określony współrzędnymi X i Y, co daje Ci pełną kontrolę nad kształtem trasy.
+    </p>
+    <p>
+        Zapisane trasy możesz przeglądać i edytować w dowolnym momencie, dzięki czemu Twoje projekty mogą stale ewoluować. 
+        Rozpocznij już teraz i stwórz trasę, która ożywi Twoje pomysły!
+            </p>
+        </div>
+        <h2>Twoje trasy:</h2>
+        <p>Lista Twoich utworzonych tras. Kliknij na trasę, aby zobaczyć szczegóły i edytować.</p>
+        <ul>
+            {% for trasa in trasy %}
+                <li>
+                    <a href="{% url 'route_detail' trasa.id %}">{{ trasa.name }}</a>
+                    <span>Utworzono: {{ trasa.created_at|date:"d-m-Y" }}</span>
+                </li>
+            {% empty %}
+                <li>Brak tras.</li>
+            {% endfor %}
+        </ul>
+
+        <div class="pagination">
+            {% if trasy.has_previous %}
+                <a href="?page=1">&laquo; Pierwsza</a>
+                <a href="?page={{ trasy.previous_page_number }}">Poprzednia</a>
+            {% endif %}
+
+            <span>
+                Strona {{ trasy.number }} z {{ trasy.paginator.num_pages }}
+            </span>
+
+            {% if trasy.has_next %}
+                <a href="?page={{ trasy.next_page_number }}">Następna</a>
+                <a href="?page={{ trasy.paginator.num_pages }}">Ostatnia &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+    <footer>
+        &copy; 2025 Edytor Tras. Wszystkie prawa zastrzeżone.
+    </footer>
+</body>
+</html>

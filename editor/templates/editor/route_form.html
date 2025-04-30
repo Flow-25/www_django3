@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stwórz Trasę</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f9f4; /* Subtelne zielonkawe tło */
+            margin: 0;
+            padding: 0;
+            color: #212529; /* Neutralny kolor tekstu */
+        }
+        .header {
+            background-color: #4CAF50; /* Zielony pasek nagłówka */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .header a:hover {
+            text-decoration: underline;
+        }
+        .logout-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .logout-container button {
+            background-color: #f44336; /* Czerwony przycisk wylogowania */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .logout-container button:hover {
+            background-color: #d32f2f; /* Ciemniejszy czerwony na hover */
+        }
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        .form-container {
+            flex: 1;
+            background-color: #ffffff; /* Białe tło dla formularza */
+            padding: 20px;
+            border-radius: 10px; /* Zaokrąglone rogi */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .form-container h2 {
+            color: #388e3c; /* Zielony kolor nagłówka */
+            margin-bottom: 15px;
+        }
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-container label {
+            font-size: 1.1em;
+            color: #2e7d32; /* Ciemniejszy zielony kolor */
+        }
+        .form-container input[type="text"],
+        .form-container select,
+        .form-container button {
+            font-size: 1em;
+            padding: 10px;
+            border: 1px solid #c8e6c9; /* Jasnozielone obramowanie */
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .form-container button {
+            background-color: #4CAF50; /* Zielony przycisk */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-container button:hover {
+            background-color: #388e3c; /* Ciemniejszy zielony na hover */
+        }
+        .description-box {
+            background-color: #f1f8e9; /* Jasnozielone tło */
+            border: 1px solid #c8e6c9; /* Jasnozielone obramowanie */
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .description-box p {
+            font-size: 1.2em;
+            color: #2e7d32; /* Ciemniejszy zielony kolor */
+        }
+        #bg-preview {
+            flex: 1;
+            text-align: center;
+            display: none;
+            max-height: 80vh;
+            overflow: hidden;
+            background-color: #ffffff; /* Białe tło dla podglądu */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        #bg-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #c8e6c9; /* Jasnozielone obramowanie */
+            border-radius: 5px;
+        }
+        #bg-preview-label {
+            font-size: 1.2em;
+            color: #388e3c; /* Zielony kolor tekstu */
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'route_list' %}">Powrót do Listy Tras</a>
+        <h1>Edytor Tras</h1>
+        {% if user.is_authenticated %}
+            <div class="logout-container">
+                Zalogowany jako {{ user.username }} |
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Wyloguj</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="content">
+        <div class="form-container">
+            <h2>Stwórz nową trasę</h2>
+            <div class="description-box">
+                <p>Wypełnij poniższy formularz, aby stworzyć nową trasę. Wybierz nazwę i tło, które najlepiej pasują do Twojej wizji. Możesz również zobaczyć podgląd wybranego tła przed zapisaniem!</p>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="button" id="preview-btn">Pogląd tła</button>
+                <button type="submit">Stwórz trasę</button>
+            </form>
+        </div>
+        <div id="bg-preview">
+            <label id="bg-preview-label">Podgląd wybranego tła</label>
+            <img id="bg-preview-img" src="" alt="Podgląd tła">
+        </div>
+    </div>
+    <script>
+        const bgUrls = {{ background_image_urls|safe }};
+        const bgSelect = document.querySelector('select[name="background"]');
+
+        document.getElementById('preview-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!bgSelect) return;
+            const selectedId = bgSelect.value;
+            const imgUrl = bgUrls[selectedId];
+            if (imgUrl) {
+                document.getElementById('bg-preview-img').src = imgUrl;
+                document.getElementById('bg-preview').style.display = 'block';
+            } else {
+                document.getElementById('bg-preview').style.display = 'none';
+            }
+        });
+
+        bgSelect?.addEventListener('change', function(){
+            document.getElementById('bg-preview').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

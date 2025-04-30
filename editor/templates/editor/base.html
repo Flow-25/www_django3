@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edytor Tras</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        .navbar .links {
+            display: flex;
+            gap: 15px;
+        }
+        .navbar .links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .navbar .links a:hover {
+            text-decoration: underline;
+        }
+        .welcome {
+            margin: 20px;
+            font-size: 18px;
+        }
+        .logout-form {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .logout-form button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .logout-form button:hover {
+            background-color: #d32f2f;
+        }
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#" class="logo">Edytor Tras</a>
+        <div class="links">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}">Logowanie</a>
+                <a href="{% url 'register' %}">Rejestracja</a>
+                <a href="{% url 'admin:login' %}">Admin</a>
+            {% else %}
+                <a href="{% url 'route_list' %}">Moje trasy</a>
+                <a href="{% url 'admin:login' %}">Admin</a>
+            {% endif %}
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+        <div class="welcome">
+            Witaj, {{ user.username }}!
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit">Wyloguj</button>
+            </form>
+        </div>
+    {% endif %}
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        &copy; 2025 Edytor Tras. Wszystkie prawa zastrzeżone.
+    </footer>
+</body>
+</html>

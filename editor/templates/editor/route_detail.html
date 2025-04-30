@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Szczegóły Trasy</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f9f4; /* Subtelne zielonkawe tło */
+            margin: 0;
+            padding: 0;
+            color: #212529; /* Neutralny kolor tekstu */
+        }
+        .header {
+            background-color: #4CAF50; /* Zielony pasek nagłówka */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .login-register-container a,
+        .user-links-container a {
+            color: white;
+            text-decoration: none;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .login-register-container a:hover,
+        .user-links-container a:hover {
+            text-decoration: underline;
+        }
+        .logout-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .logout-container button {
+            background-color: #f44336; /* Czerwony przycisk wylogowania */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .logout-container button:hover {
+            background-color: #d32f2f; /* Ciemniejszy czerwony na hover */
+        }
+        .content {
+            padding: 20px;
+        }
+        #routeCanvas {
+            position: relative;
+            pointer-events: auto;
+            border: 2px solid #c8e6c9; /* Jasnozielone obramowanie */
+            border-radius: 5px; /* Zaokrąglone rogi */
+            background-color: #ffffff; /* Białe tło dla płótna */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        #canvasAndPoints {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        #pointList {
+            margin-left: 20px;
+            height: 700px; /* Stała wysokość */
+            overflow-y: auto;
+            width: 300px; /* Szerokość listy punktów */
+            background-color: #ffffff; /* Białe tło */
+            padding: 15px;
+            border-radius: 5px; /* Zaokrąglone rogi */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        #pointList h3 {
+            font-size: 20px; /* Zmniejszony rozmiar nagłówka */
+            margin-bottom: 10px;
+            color: #388e3c; /* Zielony kolor nagłówka */
+        }
+        .point-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #c8e6c9; /* Jasnozielone obramowanie */
+            background-color: #f1f8e9; /* Jasnozielone tło */
+            border-radius: 5px; /* Zaokrąglone rogi */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .point-item button {
+            background-color: #4CAF50; /* Zielone przyciski */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .point-item button:hover {
+            background-color: #388e3c; /* Ciemniejszy zielony na hover */
+        }
+        .button-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .button-container button {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Zielony przycisk */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtelny cień */
+        }
+        .button-container button:hover {
+            background-color: #388e3c; /* Ciemniejszy zielony na hover */
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .pagination button {
+            background-color: #4CAF50; /* Zielone przyciski paginacji */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .pagination button:hover {
+            background-color: #388e3c; /* Ciemniejszy zielony na hover */
+        }
+        .route-details-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .route-details-header h1 {
+            font-size: 28px; /* Zmniejszony rozmiar nagłówka */
+            color: #2e7d32; /* Ciemniejszy zielony kolor tekstu */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="login-register-container">
+            <a href="{% url 'route_list' %}" style="font-size: 20px; color: white;">Powrót do Listy Tras</a>
+        </div>
+        <h1>Edytor Tras</h1>
+        {% if user.is_authenticated %}
+        {% endif %}
+            <p>Witaj, {{ user.username }}!</p>
+            <div class="logout-container">
+                Zalogowany jako {{ user.username }} |
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Wyloguj</button>
+                </form>
+            </div>
+    </div>
+
+    <div class="route-details-header">
+        <h1>Szczegóły Trasy - {{ route.name }}</h1>
+        <div class="button-container">
+            <form method="post" id="saveRouteForm">
+                {% csrf_token %}
+                <input type="hidden" id="route_data" name="route_data">
+                <button type="button" onclick="saveChanges()">Zapisz Zmiany</button>
+            </form>
+            <form method="post" action="{% url 'delete_route' route.id %}">
+                {% csrf_token %}
+                <button type="submit">Usuń Trasę</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="canvasAndPoints">
+            <div style="position: relative;">
+                <canvas id="routeCanvas" width="1200" height="900"></canvas>
+            </div>
+            <div id="pointList">
+                <h3>Punkty</h3>
+                <div id="pointItems"></div>
+                <div class="pagination">
+                    <button onclick="prevPage()" id="prevPageButton">Poprzednia</button>
+                    <button onclick="nextPage()" id="nextPageButton">Następna</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const canvas = document.getElementById('routeCanvas');
+    const ctx = canvas.getContext('2d');
+    let points = []; // Initialize as an empty array
+    let drawing = false;
+    const img = new Image();
+    img.src = "{{ background_image_url }}";
+    const pointListDiv = document.getElementById('pointItems');
+    const prevPageButton = document.getElementById('prevPageButton');
+    const nextPageButton = document.getElementById('nextPageButton');
+    let currentPage = 0;
+    const pointsPerPage = 10;
+    let scaleX = 1;
+    let scaleY = 1;
+
+    function initializePoints() {
+    fetch('/route/{{ route.id }}/get_points_ajax/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        points = data.points || [];
+        drawRoute();
+        updatePointList();
+    })
+    .catch(e => {
+        console.error("Błąd podczas ładowania punktów:", e);
+        points = [];
+        drawRoute();
+        updatePointList();
+    });
+}
+
+    img.onload = function() {
+        canvas.width = 1200;
+        canvas.height = 900;
+        let imgWidth = img.width;
+        let imgHeight = img.height;
+        let aspectRatio = imgWidth / imgHeight;
+
+        if (imgWidth > canvas.width) {
+            imgWidth = canvas.width;
+            imgHeight = imgWidth / aspectRatio;
+        }
+
+        if (imgHeight > canvas.height) {
+            imgHeight = canvas.height;
+            imgWidth = imgHeight * aspectRatio;
+        }
+        scaleX = canvas.width / imgWidth;
+        scaleY = canvas.height / imgHeight;
+        initializePoints(); // Initialize points after image is loaded
+        drawRoute();
+        updatePointList();
+    };
+
+    img.onerror = function() {
+        console.error("Błąd podczas ładowania obrazu:", img.src);
+    };
+
+    function drawRoute() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        if (points.length > 0) {
+            ctx.moveTo(points[0].x * scaleX, points[0].y * scaleY);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x * scaleX, points[i].y * scaleY);
+            }
+            ctx.lineTo(points[0].x * scaleX, points[0].y * scaleY);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        for (let i = 0; i < points.length; i++) {
+            ctx.beginPath();
+            ctx.arc(points[i].x * scaleX, points[i].y * scaleY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+        }
+    }
+
+    function addPoint(x, y) {
+        points.push({x: x / scaleX, y: y / scaleY, id: null}); // New points have no ID yet
+        drawRoute();
+        updatePointList();
+    }
+
+    function removePoint(index) {
+        points.splice(index, 1);
+        drawRoute();
+        updatePointList();
+    }
+
+    function movePointUp(index) {
+        if (index > 0) {
+            const temp = points[index];
+            points[index] = points[index - 1];
+            points[index - 1] = temp;
+            drawRoute();
+            updatePointList();
+        }
+    }
+
+    function movePointDown(index) {
+        if (index < points.length - 1) {
+            const temp = points[index];
+            points[index] = points[index + 1];
+            points[index + 1] = temp;
+            drawRoute();
+            updatePointList();
+        }
+    }
+
+    function updatePointList() {
+        const startIndex = currentPage * pointsPerPage;
+        const endIndex = startIndex + pointsPerPage;
+        const paginatedPoints = points.slice(startIndex, endIndex);
+
+        pointListDiv.innerHTML = '';
+
+        paginatedPoints.forEach((point, index) => {
+            const actualIndex = startIndex + index;
+            const pointItem = document.createElement('div');
+            pointItem.classList.add('point-item');
+            pointItem.innerHTML = `
+                <span>(${point.x}, ${point.y})</span>
+                <div class="move-buttons">
+                    <button onclick="movePointUp(${actualIndex})">Do góry</button>
+                    <button onclick="movePointDown(${actualIndex})">Na dół</button>
+                </div>
+                <button onclick="removePointFromList(${actualIndex})">Usuń</button>
+            `;
+            pointListDiv.appendChild(pointItem);
+        });
+
+        prevPageButton.disabled = currentPage === 0;
+        nextPageButton.disabled = (startIndex + pointsPerPage) >= points.length;
+    }
+
+    function removePointFromList(index) {
+        removePoint(index);
+        updateRouteData();
+    }
+
+    function nextPage() {
+        currentPage++;
+        updatePointList();
+    }
+
+    function prevPage() {
+        currentPage--;
+        updatePointList();
+    }
+
+    function saveChanges() {
+        updateRouteData();
+        const routeData = document.getElementById('route_data').value;
+
+        fetch('/route/{{ route.id }}/save_points_ajax/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ points: JSON.parse(routeData) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Punkty zapisane pomyślnie!');
+                points = data.points; // Use returned up-to-date points with IDs!
+                drawRoute();
+                updatePointList();
+            } else {
+                alert('Błąd podczas zapisywania punktów.');
+                console.error('Błąd podczas zapisywania punktów:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+            alert('Błąd podczas zapisywania punktów.');
+        });
+    }
+
+    function updateRouteData() {
+        document.getElementById('route_data').value = JSON.stringify(points.map((point, index) => ({
+            id: point.id,
+            x: point.x,
+            y: point.y,
+            order: index
+        })));
+    }
+
+    canvas.addEventListener('mousedown', function(e) {
+        drawing = true;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addPoint(x, y);
+    });
+
+    canvas.addEventListener('mouseup', function() {
+        drawing = false;
+        updateRouteData();
+    });
+
+    canvas.addEventListener('mousemove', function(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (points.length === 0 || Math.sqrt(Math.pow(x - points[points.length - 1].x, 2) + Math.pow(y - points[points.length - 1].y, 2)) > 10) {
+            addPoint(x, y);
+        }
+    });
+
+    // Initial draw and update
+    initializePoints(); // Initialize points when the script loads
+    img.onload();
+</script>
+</body>
+</html>
