@@ -127,6 +127,9 @@
                     {% csrf_token %}
                     <button type="submit">Wyloguj</button>
                 </form>
+                <a href="{% url 'route_list' %}">Moje trasy</a>
+                <a href="{% url 'game_board_list' %}">Moje plansze</a>
+                <a href="{% url 'admin:login' %}">Admin</a>
             </div>
         {% endif %}
     </div>

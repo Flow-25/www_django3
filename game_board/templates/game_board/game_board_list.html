@@ -1,0 +1,28 @@
+{% extends "editor/base.html" %}
+
+{% block content %}
+<div class="content">
+    <h2 style="color: #4CAF50; margin-bottom: 20px;">Twoje plansze:</h2>
+    <a href="{% url 'game_board_create' %}" class="btn" style="margin-bottom: 20px; display: inline-block;">Utwórz nową planszę</a>
+    <p style="font-size: 16px; color: #555;">Lista Twoich utworzonych plansz. Kliknij na planszę, aby zobaczyć szczegóły i edytować.</p>
+    <ul style="list-style: none; padding: 0;">
+        {% for board in boards %}
+            <li style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <a href="{% url 'game_board_detail' board.id %}" style="text-decoration: none; color: #4CAF50; font-size: 18px;">
+                        {{ board.name }}
+                    </a>
+                    <span style="display: block; font-size: 14px; color: #777; margin-top: 5px;">
+                        Utworzono: {{ board.created_at|date:"d-m-Y" }}
+                    </span>
+                </div>
+                <a href="{% url 'game_board_play' board.id %}" class="btn btn-secondary" style="margin-left: 10px;">Graj</a>
+            </li>
+        {% empty %}
+            <li style="font-size: 16px; color: #777; text-align: center; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                Brak plansz.
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

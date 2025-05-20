@@ -3,6 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 from rest_framework.routers import DefaultRouter
 from .views import RouteViewSet, RoutePointViewSet
+from game_board.views import game_board_detail
 
 router = DefaultRouter()
 router.register(r'trasy', RouteViewSet, basename='trasa')
@@ -27,4 +28,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('route/<int:route_id>/delete/', views.delete_route, name='delete_route'),
     path('api/trasy/<int:route_id>/punkty/<int:pk>/', RoutePointViewSet.as_view({'delete': 'destroy'})),
+    path('game_board/', include('game_board.urls')),
+    path('<int:pk>/', game_board_detail, name='game_board_detail'),
 ]

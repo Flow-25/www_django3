@@ -1,0 +1,27 @@
+{% extends "editor/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <h2 style="color: #4CAF50; margin-bottom: 20px;">Rysowanie trasy na planszy: {{ board.name }}</h2>
+    
+    <div id="grid-container" style="margin-bottom: 20px; border: 2px solid #ddd; border-radius: 5px; padding: 10px; background-color: #f9f9f9;">
+        <!-- Siatka gry zostanie wygenerowana tutaj -->
+    </div>
+    
+    <input type="hidden" id="board-id" value="{{ board.id }}">
+    
+    <button id="save-path-btn" class="btn" 
+        style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px;">
+        Zapisz trasę
+    </button>
+    
+    <div style="margin-bottom: 20px;">
+        <label for="color-picker" style="font-size: 16px; color: #555; margin-right: 10px;">Wybierz kolor:</label>
+        <input type="color" id="color-picker" value="#ff0000" 
+            style="padding: 5px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+    </div>
+</div>
+
+<script src="{% static 'js/game_board_play.js' %}"></script>
+{% endblock %}

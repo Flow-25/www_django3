@@ -1,0 +1,39 @@
+{% extends "editor/base.html" %}
+
+{% block content %}
+<div class="content">
+    <h2 style="color: #4CAF50; margin-bottom: 20px;">Szczegóły planszy: {{ board.name }}</h2>
+    <p style="font-size: 16px; color: #555; margin-bottom: 20px;">Wymiary: <strong>{{ board.rows }} x {{ board.cols }}</strong></p>
+
+    <h3 style="color: #4CAF50; margin-bottom: 10px;">Kropki:</h3>
+    <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+        {% for dot in dots %}
+            <li style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; margin-bottom: 10px;">
+                <strong style="color: #4CAF50;">Kropka:</strong> {{ dot.color }} na pozycji (<strong>{{ dot.row }}</strong>, <strong>{{ dot.col }}</strong>)
+            </li>
+        {% empty %}
+            <li style="font-size: 16px; color: #777; text-align: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                Brak kropek na tej planszy.
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3 style="color: #4CAF50; margin-bottom: 10px;">Rozpoczęte gry:</h3>
+    <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+        {% for game in games %}
+            <li style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="color: #4CAF50;">Gra ID:</strong> {{ game.id }} - Zapisane ścieżki: <strong>{{ game.paths|length }}</strong> kolorów
+                </div>
+                <a href="{% url 'game_board_continue' game.id %}" class="btn btn-secondary" style="margin-left: 10px;">Kontynuuj</a>
+            </li>
+        {% empty %}
+            <li style="font-size: 16px; color: #777; text-align: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                Brak rozpoczętych gier na tej planszy.
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'game_board_edit' board.id %}" class="btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Edytuj planszę</a>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "editor/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <h2>{% if board %}Edytuj planszę{% else %}Stwórz nową planszę{% endif %}</h2>
+    <form id="game-board-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="board-id" name="board-id" value="{{ board.id|default:'' }}">
+        
+        <label for="name">Nazwa planszy:</label>
+        <input type="text" id="name" name="name" value="{{ board.name|default:'' }}" required>
+        
+        <label for="rows">Liczba wierszy:</label>
+        <input type="number" id="rows" name="rows" value="{{ board.rows|default:'' }}" min="1" required>
+        
+        <label for="cols">Liczba kolumn:</label>
+        <input type="number" id="cols" name="cols" value="{{ board.cols|default:'' }}" min="1" required>
+        
+        <button type="button" id="generate-grid-btn">Generuj siatkę</button>
+    </form>
+
+    <div id="grid-container" style="margin-top: 20px;"></div>
+    <div>
+        <label for="color-picker">Wybierz kolor:</label>
+        <input type="color" id="color-picker" value="#ff0000" style="margin-bottom: 20px;">
+    </div>
+    <button type="button" id="save-board-btn" style="margin-top: 20px;">
+        {% if board %}Zapisz zmiany{% else %}Zapisz planszę{% endif %}
+    </button>
+</div>
+
+<script src="{% static 'js/game_board.js' %}"></script>
+{% endblock %}

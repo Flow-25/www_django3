@@ -63,12 +63,52 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        .btn {
+            background-color: #4CAF50; /* Zielony kolor */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #45a049; /* Ciemniejszy zielony */
+        }
         footer {
             background-color: #4CAF50;
             color: white;
             text-align: center;
             padding: 10px 0;
             margin-top: 20px;
+        }
+        #grid-container {
+            display: grid;
+            width: 100%; /* Szerokość kontenera */
+            max-width: 600px; /* Maksymalna szerokość siatki */
+            margin: 20px auto; /* Wyśrodkowanie siatki */
+            border: 2px solid #000; /* Obramowanie siatki */
+            gap: 0; /* Brak odstępów między kratkami */
+            grid-template-columns: repeat(auto-fit, minmax(1fr, 1fr)); /* Kolumny o równej szerokości */
+            grid-auto-rows: 1fr; /* Wiersze o równej wysokości */
+        }
+
+        .grid-cell {
+            background-color: #f9f9f9; /* Domyślny kolor tła */
+            border: 1px solid #ccc; /* Obramowanie komórki */
+            width: 100%; /* Kwadratowe komórki */
+            aspect-ratio: 1; /* Zachowaj proporcje kwadratu */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box; /* Uwzględnij obramowanie w rozmiarze komórki */
+        }
+
+        .grid-cell:hover {
+            background-color: #e0e0e0; /* Kolor po najechaniu */
+        }
+        .start-dot {
+            border: 3px solid black !important; /* Wyraźna czarna ramka */
+            box-sizing: border-box; /* Upewnij się, że ramka nie zmienia rozmiaru pola */
         }
     </style>
 </head>
@@ -82,6 +122,7 @@
                 <a href="{% url 'admin:login' %}">Admin</a>
             {% else %}
                 <a href="{% url 'route_list' %}">Moje trasy</a>
+                <a href="{% url 'game_board_list' %}">Moje plansze</a>
                 <a href="{% url 'admin:login' %}">Admin</a>
             {% endif %}
         </div>

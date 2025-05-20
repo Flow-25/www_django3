@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2015", // Kompiluj do ES2015 (ES6)
+      "lib": ["es2015", "dom"], // Dodaj wsparcie dla ES2015 i API przeglądarki
+      "module": "commonjs", // Użyj modułów CommonJS
+      "strict": true, // Włącz ścisły tryb TypeScript
+      "outDir": "./static/js", // Katalog wyjściowy dla skompilowanych plików
+      "rootDir": "./static", // Katalog źródłowy dla plików TypeScript
+      "esModuleInterop": true // Włącz interoperacyjność z modułami ES
+    },
+    "include": [
+      "static/js/**/*.ts" // Uwzględnij wszystkie pliki TypeScript w katalogu
+    ],
+    "exclude": []
+  }
