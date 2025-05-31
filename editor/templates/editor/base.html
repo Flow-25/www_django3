@@ -110,6 +110,48 @@
             border: 3px solid black !important; /* Wyraźna czarna ramka */
             box-sizing: border-box; /* Upewnij się, że ramka nie zmienia rozmiaru pola */
         }
+        .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .toast {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.5s, fadeOut 0.5s 4.5s;
+    }
+
+    .toast.error {
+        background-color: #f44336;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
     </style>
 </head>
 <body>

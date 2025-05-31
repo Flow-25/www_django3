@@ -12,6 +12,7 @@ from .views import (
     game_board_continue,
     overwrite_game,
     create_game,
+    sse_notifications,
 )
 
 urlpatterns = [
@@ -28,4 +29,5 @@ urlpatterns = [
     path('continue/<int:game_id>/', game_board_continue, name='game_board_continue'),
     path('<int:game_id>/overwrite/', overwrite_game, name='overwrite_game'),
     path('<int:pk>/create-game/', create_game, name='create_game'),
+    path('sse/notifications/', sse_notifications, name='sse_notifications'),
 ]

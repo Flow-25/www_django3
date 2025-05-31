@@ -247,3 +247,27 @@ def game_board_play(request, pk):
     """Widok do rysowania trasy na planszy."""
     board = get_object_or_404(GameBoard, pk=pk)
     return render(request, 'game_board/game_board_play.html', {'board': board})
+
+
+"""WIDOKI SSE"""
+import json
+import time
+from django.http import StreamingHttpResponse
+
+# Kolejka zdarzeń do wysłania
+event_queue = []
+
+def sse_notifications(request):
+    """Widok obsługujący SSE."""
+    def event_stream():
+        while True:
+            if event_queue:
+                event = event_queue.pop(0)
+                yield f"event: {event['type']}\ndata: {json.dumps(event['data'])}\n\n"
+            else:
+                yield ": keep-alive\n\n"  # Komentarz keep-alive
+            time.sleep(5)  # Odczekaj 5 sekund przed kolejną iteracją
+
+    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+    response['Cache-Control'] = 'no-cache'
+    return response
